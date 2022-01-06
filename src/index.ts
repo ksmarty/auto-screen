@@ -1,8 +1,11 @@
 import { Browser, BrowserContext, chromium, Page } from "playwright";
-import { config } from "dotenv";
 import { createTransport } from "nodemailer";
 import prompts, { PromptObject } from "prompts";
 import ora, { Ora } from "ora";
+import Cryptr from "cryptr";
+import Conf from "conf";
+
+const carriers = { Telus: "mms.mb.telus.com" } as const;
 
 interface UserData {
 	USER?: string;
@@ -10,9 +13,18 @@ interface UserData {
 	EMAIL_USER?: string;
 	EMAIL_PASS?: string;
 	PHONE?: string;
-	CARRIER?: string;
+	CARRIER?: keyof typeof carriers;
 	DOCKER?: boolean;
 }
+
+const config = new Conf({
+	projectSuffix: "",
+	schema: {
+		encData: {
+			type: "string",
+		},
+	},
+});
 
 const checkCreds = ({ USER, PASS, PHONE, CARRIER, DOCKER }: UserData) => {
 	const error = [
@@ -45,6 +57,60 @@ const checkCreds = ({ USER, PASS, PHONE, CARRIER, DOCKER }: UserData) => {
 };
 
 const getCreds = async () => {
+	console.clear();
+
+	// Get encrypted data from config
+	const encData = config.get("encData") as string;
+
+	// If data is stored in the config
+	while (encData) {
+		// Get saved password from user
+		const { password } = await prompts({
+			type: "password",
+			name: "password",
+			message: "Please enter your password",
+		});
+
+		try {
+			// Try to decrypt using given password
+			return JSON.parse(
+				new Cryptr(password).decrypt(encData)
+			) as UserData;
+		} catch {
+			// Ask if user wants to reset
+			const { reset } = await prompts([
+				{
+					type: "select",
+					name: "choice",
+					message: "That's the wrong password!",
+					choices: [
+						{ title: "Try again", value: "0" },
+						{ title: "Reset password", value: "1" },
+					],
+					initial: 0,
+				},
+				{
+					type: (e) => e && (+e ? "confirm" : false),
+					name: "reset",
+					message:
+						"Resetting the password will clear all saved data. Are you sure?",
+					initial: false,
+				},
+			]);
+
+			console.clear();
+
+			if (!reset) continue;
+
+			// User wants to reset
+			// Clear config
+			config.clear();
+			console.log("Config reset\n");
+
+			break;
+		}
+	}
+
 	const basicQs: PromptObject[] = [
 		{
 			type: "text",
@@ -61,8 +127,8 @@ const getCreds = async () => {
 			name: "notif",
 			message: "Do you want to receive screenshots?",
 			choices: [
-				{ title: "Yes, by email", value: "1" },
 				{ title: "Yes, by text", value: "2" },
+				{ title: "Yes, by email", value: "1" },
 				{ title: "No", value: "" },
 			],
 			initial: 0,
@@ -72,19 +138,23 @@ const getCreds = async () => {
 			name: "PHONE",
 			message: "What is your phone number?",
 			validate: (val) =>
-				/^\d{10}$/.test(val) || "That's not a valid phone number",
+				/^\d{10}$/.test(val) ||
+				"That's not a valid phone number! Use the format 4161230987",
 		},
 		{
 			type: (e) => e && e != 1 && "select",
 			name: "CARRIER",
 			message: "Select your carrier",
-			choices: [{ title: "Telus", value: "Telus" }],
+			choices: Object.keys(carriers).map((c) => ({ title: c, value: c })),
 			initial: 0,
 		},
 		{
 			type: (e) => e && "text",
 			name: "EMAIL_USER",
-			message: "What is your gmail username?",
+			message: "What is your gmail address?",
+			validate: (val) =>
+				/^[a-z0-9](\.?[a-z0-9]){5,}@g(oogle)?mail\.com$/i.test(val) ||
+				"That's not a valid Gmail address!",
 		},
 		{
 			type: (e) => e && "password",
@@ -93,25 +163,36 @@ const getCreds = async () => {
 		},
 	];
 
-	console.clear();
+	// Get password for encrypting config
+	const { password } = await prompts({
+		type: "password",
+		name: "password",
+		message: "Please choose a password for auto-screen",
+	});
 
-	const { USER, PASS, EMAIL_USER, EMAIL_PASS, PHONE, CARRIER } =
-		await prompts(basicQs);
+	// Get user data
+	const userData = await prompts(basicQs);
 
-	return {
-		USER,
-		PASS,
-		EMAIL_USER,
-		EMAIL_PASS,
-		PHONE,
-		CARRIER,
-	} as UserData;
+	// Write config
+	storeCreds(userData, password);
+
+	// Return data to main
+	return userData as UserData;
 };
+
+// Encrypt and store user config
+const storeCreds = (userData: UserData, password: string) =>
+	config.set(
+		"encData",
+		new Cryptr(password).encrypt(JSON.stringify(userData))
+	);
 
 class Chrome {
 	#browser!: Browser | BrowserContext;
 
 	async newPage() {
+		console.clear();
+
 		const browserSpinner = ora("Loading browser").start();
 
 		// Link to chromium user data to persist auth
@@ -274,15 +355,7 @@ const sendEmail = async (
 		},
 	}).sendMail({
 		from: `Auto Screen <${user}>`,
-		to:
-			PHONE && CARRIER
-				? `${PHONE}@${
-						{
-							// Add additional carrier here
-							Telus: "mms.mb.telus.com",
-						}[CARRIER]
-				  }`
-				: user,
+		to: PHONE && CARRIER ? `${PHONE}@${carriers[CARRIER]}` : user,
 		attachments: [
 			{
 				path: "screenshot.png",
@@ -308,13 +381,11 @@ const getEnv = () => {
 };
 
 const main = async () => {
-	if (process.env.npm_lifecycle_event == "dev") config(); // Load .env - for dev
-
+	// Get userdata for docker
 	let userData = getEnv();
 
+	// If no docker data is found, prompt user
 	while (!checkCreds(userData)) userData = await getCreds();
-
-	console.clear();
 
 	const browser = new Chrome();
 	const page = await browser.newPage();
