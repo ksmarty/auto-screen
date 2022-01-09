@@ -1,14 +1,15 @@
 {
 	"ts-node": {
 		"transpileOnly": true,
-		"files": true
+		"files": true,
+		"emit": true
 	},
 
 	"compilerOptions": {
 		"lib": ["ESNext", "DOM"],
 		"module": "CommonJS",
 		"target": "ESNext",
-		"moduleResolution": "node",
+		"moduleResolution": "Node",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,

@@ -8,5 +8,6 @@
 .env
 screenshot.png
 /src/index.js
+node_modules
 
 docker-compose.y*ml
