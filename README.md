@@ -5,7 +5,7 @@ Automate YorkU health screening.
 ## Setup
 
 1. Manually run the screening once to ensure profile information is correct.
-2. A gmail account is required to recieve a screenshot. If 2FA is enabled, setup an [application password](https://www.lifewire.com/get-a-password-to-access-gmail-by-pop-imap-2-1171882).
+2. A gmail account is required to recieve screenshots. If 2FA is enabled, setup an [application password](https://www.lifewire.com/get-a-password-to-access-gmail-by-pop-imap-2-1171882).
 
 ## Standalone Install
 
@@ -13,27 +13,89 @@ Coming Soon
 
 ## Docker
 
-**docker-compose**
+### docker-compose
+
+<table>
+  <tr>
+    <th>Environment Vars</th>
+    <th>Env File</th>
+  </tr>
+<tr>
+<td>
 
 <!-- prettier-ignore -->
-```yaml
----
-version: '3.4'
-services:
-  autoscreen:
-    image: autoscreen
-    container_name: auto-screen
-    environment:
-      USER: Passport_York_User
-      PASS: AVeryCoolPassword1
-      EMAIL_USER: steve@example.com
-      EMAIL_PASS: CoolestPassword987
-      PHONE: 4161236789
-      CARRIER: Telus
-    restart: unless-stopped
+  ```yaml
+  # docker-compose.yml
+  ---
+  version: '3'
+  services:
+    autoscreen:
+      image: autoscreen
+      container_name: auto-screen
+      environment:
+        USER: Passport_York_User
+        PASS: AVeryCoolPassword1
+        EMAIL_USER: steve@example.com
+        EMAIL_PASS: CoolestPassword987
+        PHONE: 4161236789
+        CARRIER: Telus
+        CRON: 0 7 * * MON-FRI
+      restart: "no"
+  
+  
+  
+  
+  
+  
+  
+  ```
+
+<img width="441" height="1">
+</td>
+<td>
+
+<!-- prettier-ignore -->
+  ```yaml
+  # docker-compose.yml
+  ---
+  version: '3'
+  services:
+    autoscreen:
+      image: autoscreen
+      container_name: auto-screen
+      env_file:
+        - ./as.env
+      restart: "no"
+  ```
+
+<hr>
+  <!-- prettier-ignore -->
+
+```ini
+# as.env
+USER=Passport_York_User
+PASS=AVeryCoolPassword1
+EMAIL_USER=steve@example.com
+EMAIL_PASS=CoolestPassword987
+PHONE=4161236789
+CARRIER=Telus
+CRON=0 7 * * MON-FRI
 ```
 
-**docker cli**
+<img width="441" height="1">
+</td>
+</tr>
+</table>
+
+### docker cli
+
+<table>
+  <tr>
+    <th>Environment Vars</th>
+    <th>Env File</th>
+  </tr>
+<tr>
+<td>
 
 <!-- prettier-ignore -->
 ```sh
@@ -45,22 +107,61 @@ docker run -d \
   -e EMAIL_PASS=CoolestPassword987 \
   -e PHONE=4161236789 \
   -e CARRIER=Telus \
-  --restart unless-stopped \
+  -e CRON="0 7 * * MON-FRI" \
+  --restart "no" \
+  autoscreen
+
+
+
+
+  
+```
+
+<img width="441" height="1">
+</td>
+<td>
+
+<!-- prettier-ignore -->
+```sh
+docker run -d \
+  --name=auto-screen \
+  -env-file as.env \
+  --restart "no" \
   autoscreen
 ```
+
+<hr>
+  <!-- prettier-ignore -->
+
+```ini
+# as.env
+USER=Passport_York_User
+PASS=AVeryCoolPassword1
+EMAIL_USER=steve@example.com
+EMAIL_PASS=CoolestPassword987
+PHONE=4161236789
+CARRIER=Telus
+CRON=0 7 * * MON-FRI
+```
+
+<img width="441" height="1">
+</td>
+</tr>
+</table>
 
 If only email variables are supplied, you will receive an email with the screenshot. If phone and carrier are also supplied, you will recieve a text. Leave the aforementioned variables blank to not receive a screenshot.
 
 ### Environment Variables
 
-| Env        | Function                               |
-| ---------- | -------------------------------------- |
-| USER       | Passport York username                 |
-| PASS       | Passport York password                 |
-| EMAIL_USER | Gmail address                          |
-| EMAIL_PASS | Gmail password or application password |
-| PHONE      | Phone number for screenshots           |
-| CARRIER    | Options: Telus                         |
+| Env        | Function                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| USER       | Passport York username                                                                            |
+| PASS       | Passport York password                                                                            |
+| EMAIL_USER | Gmail address                                                                                     |
+| EMAIL_PASS | Gmail password or application password                                                            |
+| PHONE      | Phone number for screenshots                                                                      |
+| CARRIER    | Options: Telus                                                                                    |
+| CRON       | Cron expression used to schedule to the program. [Generate here.](https://crontab-generator.com/) |
 
 ## Disclaimer
 
