@@ -30,7 +30,7 @@ Coming Soon
   version: '3'
   services:
     autoscreen:
-      image: autoscreen
+      image: auto-screen
       container_name: auto-screen
       environment:
         USER: Passport_York_User
@@ -61,7 +61,7 @@ Coming Soon
   version: '3'
   services:
     autoscreen:
-      image: autoscreen
+      image: auto-screen
       container_name: auto-screen
       env_file:
         - ./as.env
@@ -109,7 +109,7 @@ docker run -d \
   -e CARRIER=Telus \
   -e CRON="0 7 * * MON-FRI" \
   --restart "no" \
-  autoscreen
+  auto-screen
 
 
 
@@ -127,7 +127,7 @@ docker run -d \
   --name=auto-screen \
   -env-file as.env \
   --restart "no" \
-  autoscreen
+  auto-screen
 ```
 
 <hr>

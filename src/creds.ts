@@ -3,7 +3,6 @@ import { UserData } from "./types";
 import { configDel, configGet, configSet } from "./config";
 
 import Cryptr from "cryptr";
-// const Cryptr = require("cryptr");
 import prompts, { PromptObject } from "prompts";
 
 const getEnv = () => {
@@ -18,7 +17,7 @@ const getEnv = () => {
 		CARRIER,
 		DOCKER,
 		CRON,
-	} as UserData;
+	} as unknown as UserData;
 };
 
 const checkCreds = ({ USER, PASS, PHONE, CARRIER, DOCKER }: UserData) => {
@@ -56,7 +55,7 @@ const getCreds = async () => {
 	const userDataEnv = getEnv();
 	if (userDataEnv.DOCKER) return userDataEnv;
 
-	// console.clear();
+	console.clear();
 
 	// Get encrypted data from config
 	const encData = configGet("encData");
@@ -88,7 +87,7 @@ const getCreds = async () => {
 					],
 				},
 				{
-					type: (e) => e && (+e ? "toggle" : false),
+					type: (e) => (+e ? "toggle" : false),
 					name: "reset",
 					message:
 						"Resetting the password will clear all saved login data. Are you sure?",
@@ -98,7 +97,7 @@ const getCreds = async () => {
 				},
 			]);
 
-			// console.clear();
+			console.clear();
 
 			if (reset) continue;
 
@@ -127,30 +126,30 @@ const getCreds = async () => {
 			name: "notif",
 			message: "Do you want to receive screenshots?",
 			choices: [
-				{ title: "Yes, by text", value: "2" },
-				{ title: "Yes, by email", value: "1" },
-				{ title: "No", value: "" },
+				{ title: "Yes, by text", value: 2 },
+				{ title: "Yes, by email", value: 1 },
+				{ title: "No", value: 0 },
 			],
 		},
 		{
-			type: (e) => e && e == 2 && "text",
+			type: (e) => (e === 2 ? "text" : false),
 			name: "PHONE",
 			message: "What is your phone number?",
 			validate: (val) =>
 				/^(?:(?:(\s*\(?([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\)?\s*(?:[.-]\s*)?)([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})$/.test(
 					val
 				) || "That's not a valid phone number!",
-			format: (val) => (val as string).replace(/[^0-9]/g, ""),
+			format: (val) => val.replace(/[^0-9]/g, ""),
 		},
 		{
-			type: (e) => e && e != 1 && "select",
+			type: (e) => (typeof e === "string" ? "select" : false),
 			name: "CARRIER",
 			message: "Select your carrier",
 			choices: Object.keys(carriers).map((c) => ({ title: c, value: c })),
 			initial: 0,
 		},
 		{
-			type: (e) => e && "text",
+			type: (e) => (e ? "text" : false),
 			name: "EMAIL_USER",
 			message: "What is your gmail address?",
 			validate: (val) =>
@@ -158,7 +157,7 @@ const getCreds = async () => {
 				"That's not a valid Gmail address!",
 		},
 		{
-			type: (e) => e && "password",
+			type: (e) => (e ? "password" : false),
 			name: "EMAIL_PASS",
 			message: "What is your gmail password?",
 		},

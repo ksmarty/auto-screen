@@ -33,7 +33,7 @@ const configDel = (el: Optional<Conf>) => {
 };
 
 const userConfig = async ({ DOCKER, CRON }: UserData) => {
-	// console.clear();
+	console.clear();
 
 	if (DOCKER) {
 		if (CRON) configSet("cron", CRON);

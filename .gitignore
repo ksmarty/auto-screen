@@ -1,13 +1,6 @@
-/.yarn/*
-!/.yarn/patches
-!/.yarn/plugins
-!/.yarn/releases
-!/.yarn/sdks
-!/.yarn/cache
-
-.env
+*.env
 screenshot.png
-/src/index.js
 node_modules
+dist
 
 docker-compose.y*ml

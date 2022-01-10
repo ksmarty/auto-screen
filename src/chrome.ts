@@ -5,7 +5,7 @@ export class Chrome {
 	#browser!: Browser | BrowserContext;
 
 	async newPage() {
-		// console.clear();
+		console.clear();
 
 		const browserSpinner = ora("Loading browser").start();
 

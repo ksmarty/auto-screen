@@ -5,6 +5,7 @@ import { start } from "./run";
 export const carriers = { Telus: "mms.mb.telus.com" } as const;
 
 const main = async () => {
+	process.title = "auto-screen";
 	// Get user data
 	let userData: UserData;
 	do userData = await getCreds();

@@ -1,22 +1,34 @@
 {
 	"name": "auto-screen",
 	"license": "GPL-3.0-or-later",
-	"type": "module",
+	"version": "1.0.0-rc.1",
+	"bin": "dist/auto-screen.js",
+	"scripts": {
+		"dev": "pnpm build:js && pnpm start",
+		"build:js": "node esbuild.js",
+		"build:docker": "docker build -t auto-screen .",
+		"build:binaries": "pnpm build:js && pkg .",
+		"start": "node dist/auto-screen.js"
+	},
+	"pkg": {
+		"compress": "Brotli",
+		"targets": [
+			"node16-win",
+			"node16-macos",
+			"node16-linux"
+		],
+		"outputPath": "dist"
+	},
 	"devDependencies": {
 		"@types/cryptr": "^4.0.1",
-		"@types/node": "^17.0.0",
+		"@types/node": "^17.0.8",
 		"@types/node-cron": "^3.0.1",
 		"@types/nodemailer": "^6.4.4",
-		"@types/ora": "^3.2.0",
 		"@types/prompts": "^2.0.14",
-		"playwright": "^1.17.1",
-		"ts-node-dev": "^1.1.8",
-		"typescript": "^4.5.4"
-	},
-	"scripts": {
-		"dev": "ts-node-dev --respawn --cls --quiet ./src/index.ts",
-		"start": "ts-node-dev --cls --quiet ./src/index.ts",
-		"dcu": "docker-compose up -d"
+		"esbuild": "^0.14.11",
+		"playwright": "^1.17.2",
+		"typescript": "^4.5.4",
+		"ws": "^8.4.0"
 	},
 	"dependencies": {
 		"@batuhanw/haf": "^0.1.3",
@@ -26,7 +38,7 @@
 		"date-fns": "^2.28.0",
 		"node-cron": "^3.0.0",
 		"nodemailer": "^6.7.2",
-		"ora": "5.4.1",
+		"ora": "^6.0.1",
 		"prompts": "^2.4.2"
 	}
 }

@@ -14,7 +14,7 @@ class CountDown {
 	#nextRun: NodeJS.Timer;
 
 	constructor() {
-		// console.clear();
+		console.clear();
 
 		this.#spinner = ora(this.#spinnerText()).start();
 		this.#nextRun = setInterval(
@@ -30,7 +30,7 @@ class CountDown {
 	}
 
 	start() {
-		// console.clear();
+		console.clear();
 
 		this.#spinner = ora(this.#spinnerText()).start();
 		this.#nextRun = setInterval(

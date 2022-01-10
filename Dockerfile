@@ -1,14 +1,16 @@
 FROM mcr.microsoft.com/playwright:focal
 
-ENV NODE_ENV=production
 ENV DOCKER=true
 ENV XDG_CONFIG_HOME=/app
 
 WORKDIR /app
-COPY . .
-RUN yarn rebuild
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install
+COPY . /app
+RUN pnpm build:js
 
 RUN useradd -ms /bin/bash node
 RUN chown -R node /app
 USER node
-CMD yarn start
+CMD node dist/index.js
