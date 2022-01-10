@@ -7,9 +7,9 @@ Automate YorkU health screening.
 1. Manually run the screening once to ensure profile information is correct.
 2. A gmail account is required to recieve screenshots. If 2FA is enabled, setup an [application password](https://www.lifewire.com/get-a-password-to-access-gmail-by-pop-imap-2-1171882).
 
-## Standalone Install
+## Standalone
 
-Coming Soon
+Download and run the latest version from the [releases page](https://github.com/ksmarty/auto-screen/releases).
 
 ## Docker
 
@@ -114,6 +114,7 @@ docker run -d \
 
 
 
+  
   
 ```
 
