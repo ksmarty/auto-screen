@@ -13,6 +13,8 @@ Download and run the latest version from the [releases page](https://github.com/
 
 ## Docker
 
+Both [GHCR](https://github.com/ksmarty/auto-screen/pkgs/container/auto-screen) and [Docker Hub](https://hub.docker.com/r/ksmarty/auto-screen) images are available. Examples use DH but are interchangable with GHCR.
+
 ### docker-compose
 
 <table>
@@ -30,7 +32,7 @@ Download and run the latest version from the [releases page](https://github.com/
   version: '3'
   services:
     autoscreen:
-      image: auto-screen
+      image: ksmarty/auto-screen
       container_name: auto-screen
       environment:
         USER: Passport_York_User
@@ -61,7 +63,7 @@ Download and run the latest version from the [releases page](https://github.com/
   version: '3'
   services:
     autoscreen:
-      image: auto-screen
+      image: ksmarty/auto-screen
       container_name: auto-screen
       env_file:
         - ./as.env
@@ -109,7 +111,7 @@ docker run -d \
   -e CARRIER=Telus \
   -e CRON="0 7 * * MON-FRI" \
   --restart "no" \
-  auto-screen
+  ksmarty/auto-screen
 
 
 
@@ -128,7 +130,7 @@ docker run -d \
   --name=auto-screen \
   -env-file as.env \
   --restart "no" \
-  auto-screen
+  ksmarty/auto-screen
 ```
 
 <hr>
