@@ -13,4 +13,4 @@ RUN pnpm build:js
 RUN useradd -ms /bin/bash node
 RUN chown -R node /app
 USER node
-CMD node dist/index.js
+CMD node dist/auto-screen.js
