@@ -1,7 +1,7 @@
 {
 	"name": "auto-screen",
 	"license": "GPL-3.0-or-later",
-	"version": "1.0.0-rc.1",
+	"version": "1.0.0",
 	"bin": "dist/auto-screen.js",
 	"scripts": {
 		"dev": "pnpm build:js && pnpm start",
